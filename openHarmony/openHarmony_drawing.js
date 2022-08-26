@@ -355,7 +355,8 @@ Object.defineProperty($.oDrawing.prototype, 'activeArtLayer', {
 /**
  * the selected shapes on this drawing
  * @name $.oDrawing#selectedShapes
- * @type {$.oShape}
+ * @readonly
+ * @type {$.oShape[]}
  */
 Object.defineProperty($.oDrawing.prototype, 'selectedShapes', {
   get: function () {
@@ -365,14 +366,19 @@ Object.defineProperty($.oDrawing.prototype, 'selectedShapes', {
     }
 
     return _selectedShapes;
+  },
+
+  set: function(shapes) {
+    throw new Error ("Can't set selectedShapes on a Drawing. Use the artLayer that contains the selection directly.")
   }
 })
 
 
 /**
- * the selected shapes on this drawing
+ * the selected strokes on this drawing
  * @name $.oDrawing#selectedStrokes
- * @type {$.oShape}
+ * @readonly
+ * @type {$.oStroke[]}
  */
 Object.defineProperty($.oDrawing.prototype, 'selectedStrokes', {
   get: function () {
@@ -382,14 +388,19 @@ Object.defineProperty($.oDrawing.prototype, 'selectedStrokes', {
     }
 
     return _selectedStrokes;
+  },
+
+  set: function(shapes) {
+    throw new Error ("Can't set selectedStrokes on a Drawing. Use the artLayer that contains the selection directly.")
   }
 })
 
 
 /**
- * the selected shapes on this drawing
+ * the selected contours on this drawing
  * @name $.oDrawing#selectedContours
- * @type {$.oShape}
+ * @readonly
+ * @type {$.oContour[]}
  */
 Object.defineProperty($.oDrawing.prototype, 'selectedContours', {
   get: function () {
@@ -399,6 +410,10 @@ Object.defineProperty($.oDrawing.prototype, 'selectedContours', {
     }
 
     return _selectedContours;
+  },
+
+  set: function(contours) {
+    throw new Error ("Can't set selectedContours on a Drawing. Use the artLayer that contains the selection directly.")
   }
 })
 
@@ -840,6 +855,7 @@ Object.defineProperty($.oArtLayer.prototype, 'selectedShapes', {
 
     for (var i in shapes){
       var shape = shapes[i];
+      if (this.drawing.name != shape.artLayer.drawing.name && shape.artLayer.name != this.name) throw new Error ("Can't set selection to an element not contained on current ArtLayer.")
       var strokesDescriptions = shape.strokes.map(function(x){return {stroke:true, strokeIndex:x.index, layer:shape.index}});
       var contoursDescriptions = shape.contours.map(function(x){return {leftShader:true, strokeIndex:x.index, layer:shape.index}});
       config.selectedStrokes = config.selectedStrokes.concat(strokesDescriptions);
@@ -879,6 +895,7 @@ Object.defineProperty($.oArtLayer.prototype, 'selectedStrokes', {
 
     for (var i in strokes){
       var stroke = strokes[i];
+      if (stroke.artLayer != this) throw new Error ("Can't set selection to an element not contained on current ArtLayer.")
       config.selectedStrokes.push({stroke:true, strokeIndex:stroke.index, layer:stroke.shape.index});
     }
 
@@ -914,6 +931,7 @@ Object.defineProperty($.oArtLayer.prototype, 'selectedContours', {
 
     for (var i in contours){
       var contour = contours[i];
+      if (contour.artLayer != this) throw new Error ("Can't set selection to an element not contained on current ArtLayer.")
       config.selectedStrokes.push({leftShader:true, strokeIndex:contour.index, layer:contour.shape.index});
     }
 
